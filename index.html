@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>우리의 결혼식 방명록</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#fff9f2;color:#514239;font-family:system-ui,sans-serif}
+main{max-width:640px;margin:auto;padding:28px 18px 40px}
+header{text-align:center}
+.tag{font-size:11px;letter-spacing:4px;color:#957c63}
+h1{font-size:28px;margin:14px 0}
+.sub{font-size:14px;color:#826f60;line-height:1.8}
+.notice{background:#f6ecd9;padding:12px;border-radius:12px;font-size:12px;line-height:1.7}
+.garden{height:340px;position:relative;overflow:hidden;margin:22px 0 12px;
+border:6px solid #fff;outline:1px solid #dedec6;border-radius:18px;
+background:repeating-conic-gradient(#c4dba1 0% 25%,#c9dfaa 0% 50%) 0/32px 32px}
+.path{position:absolute;left:37%;width:26%;height:100%;background:#f1e4c7}
+.arch{position:absolute;top:18px;left:50%;transform:translateX(-50%);
+width:164px;height:110px;border:9px solid #fffaf0;border-bottom:0;
+border-radius:85px 85px 0 0;text-align:center;padding-top:12px;
+color:#bf6d78;font-size:25px;background:#ffffff35}
+.couple{position:absolute;top:82px;left:50%;transform:translateX(-50%);display:flex;gap:16px}
+.couple canvas{width:36px;height:48px;image-rendering:pixelated}
+.flower{position:absolute;font-size:25px;pointer-events:none}
+.actor{position:absolute;padding:0;border:0;background:none;cursor:pointer;
+width:58px;min-height:68px;transition:left 4s linear,top 4s linear;color:#433c31}
+.actor canvas{display:block;margin:auto;width:30px;height:40px;image-rendering:pixelated}
+.actor span{display:block;background:#fffdf0e8;border-radius:7px;padding:3px 2px;
+font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hint{text-align:center;color:#82755e;font-size:12px}
+.card{background:white;border:1px solid #ede2d5;padding:20px;border-radius:18px;margin-top:22px}
+h2{font-size:18px;margin:0 0 16px}
+label{display:block;font-size:13px;margin:15px 0 8px}
+input,textarea{width:100%;padding:12px;border:1px solid #e1d7ca;border-radius:10px;
+font:inherit;font-size:16px;background:#fffcf8}
+textarea{resize:vertical;min-height:100px}
+.choices{display:flex;gap:10px;flex-wrap:wrap}
+.choice{background:#faf5ec;border:2px solid transparent;border-radius:12px;padding:10px 13px}
+.choice[aria-pressed="true"]{border-color:#ac6e6e;background:#fff0ed}
+.choice canvas{display:block;width:24px;height:32px;image-rendering:pixelated}
+.submit{width:100%;margin-top:16px;padding:15px;border:0;border-radius:12px;
+background:#956c65;color:white;font-size:16px;font-weight:bold}
+#status{font-size:13px;color:#76554e;line-height:1.6}
+.entry{border-top:1px solid #eee5db;padding:14px 0}
+.entry p{margin:7px 0;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7}
+.entry small{color:#948575}
+.empty{font-size:14px;color:#948575}
+dialog{border:0;border-radius:18px;padding:24px;width:calc(100% - 40px);max-width:380px}
+dialog::backdrop{background:#352e3866}
+dialog p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8}
+dialog button{padding:10px 24px;background:#956c65;color:white;border:0;border-radius:8px}
+footer{text-align:center;margin-top:25px;font-size:12px;color:#a18c7c}
+@media(prefers-reduced-motion:reduce){.actor{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div class="tag">OUR WEDDING DAY</div>
+<h1>신랑 *** ♥ 신부 ***</h1>
+<p class="sub">우리의 시작을 함께해 주셔서 감사합니다.<br>
+작은 정원에 따뜻한 축하를 남겨주세요.</p>
+</header>
+
+<p class="notice">🌱 시험 운영 화면 · 글은 이 브라우저에만 저장되며
+다른 하객에게는 보이지 않아요. 브라우저 데이터를 지우면 글도 사라져요.</p>
+
+<div class="garden" id="garden" aria-label="캐릭터가 산책하는 결혼식 정원">
+<div class="path"></div>
+<div class="arch">🌸 ♥ 🌸</div>
+<div class="couple" id="couple"></div>
+<div class="flower" style="left:8%;top:35px">🌷</div>
+<div class="flower" style="right:8%;top:35px">🌷</div>
+<div class="flower" style="left:5%;bottom:25px">🌼</div>
+<div class="flower" style="right:5%;bottom:25px">🌼</div>
+</div>
+<p class="hint">정원의 하객 캐릭터를 누르면 축하 글을 볼 수 있어요.</p>
+
+<section class="card">
+<h2>💌 축하 마음 남기기</h2>
+<form id="form">
+<label>나의 캐릭터</label>
+<div class="choices" id="choices"></div>
+<label for="guest">이름 또는 별명</label>
+<input id="guest" maxlength="12" placeholder="최대 12자" required>
+<label for="message">축하 메시지</label>
+<textarea id="message" maxlength="300" placeholder="두 분의 결혼을 축하해요!" required></textarea>
+<button class="submit" type="submit">정원에 입장하기</button>
+<p id="status" role="status"></p>
+</form>
+</section>
+
+<section class="card">
+<h2>축하 메시지 <span id="count">0</span></h2>
+<div id="entries"></div>
+</section>
+<footer>함께해 주신 마음, 오래 간직할게요 ♥</footer>
+</main>
+
+<dialog id="popup">
+<h2 id="popupName"></h2>
+<p id="popupText"></p>
+<form method="dialog"><button>닫기</button></form>
+</dialog>
+
+<script>
+const $=id=>document.getElementById(id);
+const colors=["#c8818e","#7b9cce","#92ad78","#c9a254","#a18bbf","#657e84"];
+const key="wedding-garden-demo-v1";
+let selected=0;
+let guests=[];
+const actors=[];
+const pattern=[
+"00111100",
+"01111110",
+"01222210",
+"00232300",
+"00222200",
+"00022000",
+"00444400",
+"02444420",
+"02444420",
+"00444400",
+"00055000",
+"00500500"
+];
+
+function sprite(color){
+  const c=document.createElement("canvas");
+  c.width=8;c.height=12;
+  c.setAttribute("aria-hidden","true");
+  const ctx=c.getContext("2d");
+  const palette=["","#49392f","#f2c9a5","#382d32",color,"#55464b"];
+  pattern.forEach((row,y)=>{
+    [...row].forEach((n,x)=>{
+      if(n!=="0"){
+        ctx.fillStyle=palette[Number(n)];
+        ctx.fillRect(x,y,1,1);
+      }
+    });
+  });
+  return c;
+}
+
+$("couple").append(sprite("#3f485b"),sprite("#fffaf3"));
+
+colors.forEach((color,i)=>{
+  const b=document.createElement("button");
+  b.type="button";
+  b.className="choice";
+  b.setAttribute("aria-label","캐릭터 "+(i+1));
+  b.setAttribute("aria-pressed",String(i===0));
+  b.append(sprite(color));
+  b.onclick=()=>{
+    selected=i;
+    [...$("choices").children].forEach((el,j)=>{
+      el.setAttribute("aria-pressed",String(i===j));
+    });
+  };
+  $("choices").append(b);
+});
+
+try{
+  const saved=JSON.parse(localStorage.getItem(key)||"[]");
+  if(Array.isArray(saved)){
+    guests=saved.filter(g=>
+      g && typeof g.name==="string" && typeof g.text==="string" &&
+      Number.isInteger(g.color) && g.color>=0 && g.color<colors.length
+    ).slice(-100);
+  }
+}catch{
+  $("status").textContent="기존 저장 내용을 불러오지 못했어요.";
+}
+
+function move(b){
+  const garden=$("garden");
+  const x=Math.random()*Math.max(0,garden.clientWidth-58);
+  const y=145+Math.random()*Math.max(0,garden.clientHeight-145-68);
+  b.style.left=x+"px";
+  b.style.top=y+"px";
+}
+
+function render(){
+  actors.forEach(b=>b.remove());
+  actors.length=0;
+  $("entries").replaceChildren();
+  $("count").textContent=guests.length;
+
+  if(!guests.length){
+    const p=document.createElement("p");
+    p.className="empty";
+    p.textContent="첫 번째 축하의 주인공이 되어주세요.";
+    $("entries").append(p);
+  }
+
+  guests.forEach(g=>{
+    const entry=document.createElement("article");
+    entry.className="entry";
+    const name=document.createElement("strong");
+    name.textContent=g.name;
+    const text=document.createElement("p");
+    text.textContent=g.text;
+    const time=document.createElement("small");
+    time.textContent=typeof g.date==="string"?g.date:"";
+    entry.append(name,text,time);
+    $("entries").prepend(entry);
+  });
+
+  guests.slice(-24).forEach(g=>{
+    const b=document.createElement("button");
+    b.className="actor";
+    b.type="button";
+    b.setAttribute("aria-label",g.name+"님의 축하 메시지 보기");
+    const label=document.createElement("span");
+    label.textContent=g.name;
+    b.append(sprite(colors[g.color]),label);
+    b.onclick=()=>{
+      $("popupName").textContent=g.name+"님의 축하";
+      $("popupText").textContent=g.text;
+      $("popup").showModal();
+    };
+    $("garden").append(b);
+    actors.push(b);
+    move(b);
+  });
+}
+
+$("form").onsubmit=e=>{
+  e.preventDefault();
+  const name=$("guest").value.trim();
+  const text=$("message").value.trim();
+  if(!name||!text){
+    $("status").textContent="이름과 축하 메시지를 입력해주세요.";
+    return;
+  }
+  if(guests.length>=100){
+    $("status").textContent="시험판은 이 브라우저에 100개까지 저장할 수 있어요.";
+    return;
+  }
+  const next=[...guests,{
+    name,text,color:selected,date:new Date().toLocaleDateString("ko-KR")
+  }];
+  try{
+    localStorage.setItem(key,JSON.stringify(next));
+  }catch{
+    $("status").textContent="저장하지 못했어요. 브라우저의 저장 허용 설정을 확인해주세요.";
+    return;
+  }
+  guests=next;
+  render();
+  $("form").reset();
+  $("status").textContent="이 브라우저에 저장했어요! 정원에서 내 캐릭터를 눌러보세요.";
+};
+
+render();
+setInterval(()=>{
+  if(!document.hidden && !matchMedia("(prefers-reduced-motion: reduce)").matches){
+    actors.forEach(move);
+  }
+},4500);
+window.addEventListener("resize",()=>actors.forEach(move));
+</script>
+</body>
+</html>
